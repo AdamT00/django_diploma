@@ -19,9 +19,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'drf_spectacular_sidecar',
-    'authentication.apps.AuthenticationConfig',
     'rest_framework.authtoken',
-    # 'users',
 ]
 
 MIDDLEWARE = [
@@ -46,12 +44,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ]
 }
-
-# SPECTACULAR_SETTINGS = {
-#     'SWAGGER_UI_DIST': 'SIDECAR',
-#     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
-#     'REDOC_DIST': 'SIDECAR',
-# }
 
 TEMPLATES = [
     {
