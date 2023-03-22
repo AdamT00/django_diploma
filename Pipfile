@@ -5,7 +5,9 @@ name = "pypi"
 
 [packages]
 django = "*"
+pytz = "*"
 djangorestframework = "*"
+drf-spectacular = {extras = ["sidecar"], version = "*"}
 
 [dev-packages]
 
