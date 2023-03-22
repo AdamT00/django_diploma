@@ -3,5 +3,6 @@ from . import views
 
 urlpatterns = [
     path('', views.AuthView.as_view(), name='hello_auth'),
-    path('?name=<str:name>/?password=<str:password>', views.AuthView.as_view(), name='user_authentication'),
+    path('users/', views.AuthView.as_view(), name='users'),
+    # path('?name=<str:name>/?password=<str:password>', views.AuthView.as_view(), name='user_authentication'),
 ]

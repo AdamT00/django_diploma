@@ -9,4 +9,3 @@ class AuthView(generics.GenericAPIView):
 
     def get(self, request):
         return Response(data={'message': 'Hello Auth', 'name': 'asd'}, status=status.HTTP_200_OK)
-
