@@ -8,7 +8,9 @@ from rest_framework.response import Response
 class AddUser(generics.GenericAPIView):
     model = Post
 
-    def post(self, request):
-        request.POST.get('title', '')
-        request.POST.get('body', '')
-        return Response(data={'message': 'asd'}, status=status.HTTP_200_OK)
+    def post(self, args, **kwargs):
+        title = kwargs['title']
+        body = kwargs['body']
+        # title = request.POST.get('title')
+        # body = request.POST.get('body')
+        return Response(data={'title': title, 'body': body}, status=status.HTTP_200_OK)
