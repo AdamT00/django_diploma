@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from drf_spectacular.utils import extend_schema
 from rest_framework import authentication
 from rest_framework import status, serializers
@@ -15,17 +16,24 @@ class PostSerializer(serializers.ModelSerializer):
 
 class AddPost(APIView):
     model = Post
-    authentication_classes = [authentication.TokenAuthentication, authentication.BasicAuthentication]
+    authentication_classes = [authentication.TokenAuthentication]
 
     @extend_schema(
         request=PostSerializer,
         responses=PostSerializer,
     )
     def post(self, args, **kwargs):
-        title = self.request.data.get('title', '')
-        body = self.request.data.get('body', '')
-        user_id = self.request.user
-        return self.insert_post([title, body, user_id])
+        try:
+            title = self.request.data.get('title', '')
+            body = self.request.data.get('body', '')
+            user_id = self.request.user
+            serializer = PostSerializer(data={'title': title, 'body': body})
+            serializer.is_valid(raise_exception=True)
+            return self.insert_post([title, body, user_id])
+        except Exception:
+            print('The title is too long or too short.')
+            return Response(data={'message': 'Failed to create object!'}, status=status.HTTP_400_BAD_REQUEST)
+
 
     def insert_post(self, data):
         Post.objects.create(title=data[0], body=data[1], user_id=data[2])
