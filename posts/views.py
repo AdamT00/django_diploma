@@ -3,7 +3,6 @@ from rest_framework import authentication
 from rest_framework import status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 
 from posts.models import Post
 
@@ -30,4 +29,5 @@ class AddPost(APIView):
 
     def insert_post(self, data):
         Post.objects.create(title=data[0], body=data[1], user_id=data[2])
-        return Response(data={'message': 'Object created!', 'title': data[0]}, status=status.HTTP_201_CREATED)
+        return Response(data={'message': 'Object created!', 'title': data[0], 'body': data[1]},
+                        status=status.HTTP_201_CREATED)
