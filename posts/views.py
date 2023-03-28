@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema
 from rest_framework import authentication
 from rest_framework import status, serializers
+from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -28,7 +29,7 @@ class GetPostSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'date_created', 'date_updated', 'user']
 
 
-class Posts(APIView):
+class Posts(ListCreateAPIView):
     model = Post
     authentication_classes = [authentication.TokenAuthentication]
 
@@ -36,7 +37,7 @@ class Posts(APIView):
         request=GetPostSerializer,
         responses=GetPostSerializer,
     )
-    def get(self, args, **kwargs):
+    def list(self, args, **kwargs):
         all_posts = Post.objects.all()
         serializer = GetPostSerializer(all_posts, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
