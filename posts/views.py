@@ -31,7 +31,6 @@ class Posts(APIView):
     def get(self, args, **kwargs):
         all_posts = Post.objects.all()
         serializer = GetPostSerializer(all_posts, many=True)
-        json = JSONRenderer().render(serializer.data)
         return Response(data={'message': serializer.data}, status=status.HTTP_200_OK)
 
     @extend_schema(
