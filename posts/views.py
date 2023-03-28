@@ -21,11 +21,11 @@ class AddPostSerializer(serializers.ModelSerializer):
 
 
 class GetPostSerializer(serializers.ModelSerializer):
-    user_id = UsersSerializer(read_only=True)
+    user = UsersSerializer(read_only=True)
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'date_created', 'date_updated', 'user_id']
+        fields = ['id', 'title', 'date_created', 'date_updated', 'user']
 
 
 class Posts(APIView):
