@@ -2,9 +2,8 @@ from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema
 from rest_framework import authentication
 from rest_framework import status, serializers
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from posts.models import Post
 
@@ -62,3 +61,20 @@ class Posts(ListCreateAPIView):
         Post.objects.create(title=data[0], body=data[1], user_id=data[2])
         return Response(data={'message': 'Object created!', 'title': data[0], 'body': data[1]},
                         status=status.HTTP_201_CREATED)
+
+
+class PostById(ListAPIView):
+    model = Post
+    authentication_classes = [authentication.TokenAuthentication]
+
+    def list(self, request, **kwargs):
+        try:
+            post_id = kwargs['id']
+            post = Post.objects.filter(id=post_id).values()
+            if post_id not in [None, 0, False] and post:
+                return Response(data=post, status=status.HTTP_200_OK)
+            raise ValueError
+        except ValueError:
+            return Response(data={'message': 'Failed to get data!'}, status=status.HTTP_400_BAD_REQUEST)
+
+
