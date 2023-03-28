@@ -1,11 +1,17 @@
+from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema
 from rest_framework import authentication
 from rest_framework import status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.renderers import JSONRenderer
 
 from posts.models import Post
+
+
+class UsersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
 
 
 class AddPostSerializer(serializers.ModelSerializer):
@@ -15,9 +21,11 @@ class AddPostSerializer(serializers.ModelSerializer):
 
 
 class GetPostSerializer(serializers.ModelSerializer):
+    user_id = UsersSerializer(read_only=True)
+
     class Meta:
         model = Post
-        fields = ['title', 'date_created']
+        fields = ['id', 'title', 'date_created', 'date_updated', 'user_id']
 
 
 class Posts(APIView):
