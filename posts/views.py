@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from drf_spectacular.utils import extend_schema
 from rest_framework import authentication
 from rest_framework import status, serializers
@@ -26,6 +27,14 @@ class GetPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'title', 'date_created', 'date_updated', 'user']
+
+
+class GetPostByIdSerializer(serializers.ModelSerializer):
+    user = UsersSerializer()
+
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'body', 'date_created', 'date_updated', 'user']
 
 
 class Posts(ListCreateAPIView):
@@ -70,11 +79,12 @@ class PostById(ListAPIView):
     def list(self, request, **kwargs):
         try:
             post_id = kwargs['id']
-            post = Post.objects.filter(id=post_id).values()
-            if post_id not in [None, 0, False] and post:
-                return Response(data=post, status=status.HTTP_200_OK)
-            raise ValueError
-        except ValueError:
-            return Response(data={'message': 'Failed to get data!'}, status=status.HTTP_400_BAD_REQUEST)
+            post = Post.objects.get(id=post_id)
+            serializer = GetPostByIdSerializer(post)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(data={'message': 'Object does not exist!'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
