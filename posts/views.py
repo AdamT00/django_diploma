@@ -58,12 +58,11 @@ class Posts(ListCreateAPIView):
         try:
             title = self.request.data.get('title', '')
             body = self.request.data.get('body', '')
-            user_id = self.request.user
+            user_id = self.request.user.id
             serializer = AddPostSerializer(data={'title': title, 'body': body})
             serializer.is_valid(raise_exception=True)
             return self.insert_post([title, body, user_id])
         except Exception:
-            print('The title is too long or too short.')
             return Response(data={'message': 'Failed to create object!'}, status=status.HTTP_400_BAD_REQUEST)
 
     def insert_post(self, data):
@@ -84,7 +83,3 @@ class PostById(ListAPIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             return Response(data={'message': 'Object does not exist!'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
