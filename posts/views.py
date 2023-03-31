@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import authentication
 from rest_framework import status, serializers
-from rest_framework.generics import ListCreateAPIView, ListAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView
 from rest_framework.response import Response
 
 from posts.models import Post
@@ -38,9 +38,14 @@ class GetPostByIdSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'body', 'date_created', 'date_updated', 'user']
 
 
+class PutPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'body']
+
+
 class Posts(ListCreateAPIView):
     model = Post
-
     authentication_classes = [authentication.TokenAuthentication]
 
     @extend_schema(
@@ -82,3 +87,19 @@ class PostById(ListAPIView):
         post = get_object_or_404(Post, id=post_id)
         serializer = GetPostByIdSerializer(post)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=PutPostSerializer,
+        responses=PutPostSerializer,
+    )
+    def put(self, request, **kwargs):
+        try:
+            post_id = kwargs['id']
+            post = get_object_or_404(Post, id=post_id)
+            serializer = PutPostSerializer(post, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(data=serializer.data, status=status.HTTP_200_OK)
+            raise ValueError
+        except ValueError:
+            return Response(data={'message': 'Failed to update object!'}, status=status.HTTP_400_BAD_REQUEST)

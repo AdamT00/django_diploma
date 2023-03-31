@@ -19,7 +19,7 @@ class TestCase(APITestCase):
         Token.objects.create(user=self.user)
         super(TestCase, self).setUp()
 
-    def test_can_read_post_detail(self):
+    def test_read_post_detail(self):
         self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
         response = self.client.get(reverse('post_by_id', kwargs={'id': self.post1.id}))
@@ -29,7 +29,7 @@ class TestCase(APITestCase):
         self.assertEqual(response.data['user']['id'], self.user.id)
         self.assertEqual(response.data['user']['username'], self.user.username)
 
-    def test_can_read_post_detail_negative(self):
+    def test_read_post_detail_negative(self):
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
         response = self.client.get(reverse('post_by_id', kwargs={'id': 2}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -46,4 +46,27 @@ class TestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
         sample_data = {'title': 'Sample title that contains more than thirty characters', 'body': 'Sample content'}
         response = self.client.post(reverse('posts'), sample_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_post_update(self):
+        self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        sample_data = {'title': 'Sample title', 'body': 'Sample content'}
+        response = self.client.put(
+            reverse('post_by_id', kwargs={'id': self.post1.id}),
+            data=sample_data,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['id'], self.post1.id)
+        self.assertEqual(response.data['title'], sample_data['title'])
+        self.assertEqual(response.data['body'], sample_data['body'])
+
+    def test_post_update_negative(self):
+        self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.put(
+            reverse('post_by_id', kwargs={'id': self.post1.id}),
+            data={'title': 'Sample title', 'body': ''},
+            content_type='application/json'
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
