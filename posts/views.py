@@ -21,16 +21,6 @@ class AddPostSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'body']
 
 
-class PutPostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = ['id', 'title', 'body']
-
-    def update(self, instance, validated_data):
-        instance.title = validated_data.get('title', instance.title)
-        instance.body = validated_data.get('title', instance.title)
-
-
 class GetPostSerializer(serializers.ModelSerializer):
     user = UsersSerializer(read_only=True)
 
@@ -93,4 +83,4 @@ class PostById(ListAPIView):
             serializer = GetPostByIdSerializer(post)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
-            return Response(data={'message': 'Object does not exist!'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'message': 'Object does not exist!'}, status=status.HTTP_404_NOT_FOUND)
