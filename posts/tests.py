@@ -17,13 +17,18 @@ class TestCase(APITestCase):
                                              is_active=1,
                                              password='password')
         Token.objects.create(user=self.user)
-        self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
         super(TestCase, self).setUp()
 
     def test_can_read_post_detail(self):
+        self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
         response = self.client.get(reverse('post_by_id', kwargs={'id': self.post1.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['title'], self.post1.title)
+        self.assertEqual(response.data['body'], self.post1.body)
+        self.assertEqual(response.data['user']['id'], self.user.id)
+        self.assertEqual(response.data['user']['username'], self.user.username)
+
 
     def test_can_read_post_detail_negative(self):
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
