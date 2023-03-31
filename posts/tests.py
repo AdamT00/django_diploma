@@ -61,7 +61,7 @@ class TestCase(APITestCase):
         self.assertEqual(response.data['title'], sample_data['title'])
         self.assertEqual(response.data['body'], sample_data['body'])
 
-    def test_post_update_negative(self):
+    def test_post_update_empty_body(self):
         self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
         response = self.client.put(
@@ -70,3 +70,33 @@ class TestCase(APITestCase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_post_update_empty_title(self):
+        self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.put(
+            reverse('post_by_id', kwargs={'id': self.post1.id}),
+            data={'title': '', 'body': 'Sample body'},
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_post_update_title_too_long(self):
+        self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.put(
+            reverse('post_by_id', kwargs={'id': self.post1.id}),
+            data={'title': 'Sample title that contains more than thirty characters lorem ipsum', 'body': 'Sample body'},
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_post_update_wrong_id(self):
+        self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.put(
+            reverse('post_by_id', kwargs={'id': 123}),
+            data={'title': 'Sample title', 'body': 'Sample body'},
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
