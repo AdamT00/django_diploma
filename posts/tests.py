@@ -29,9 +29,9 @@ class TestCase(APITestCase):
         self.assertEqual(response.data['user']['id'], self.user.id)
         self.assertEqual(response.data['user']['username'], self.user.username)
 
-    def test_read_post_detail_negative(self):
+    def test_read_post_detail_wrong_id(self):
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
-        response = self.client.get(reverse('post_by_id', kwargs={'id': 2}))
+        response = self.client.get(reverse('post_by_id', kwargs={'id': 123}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_post_creation(self):
@@ -42,9 +42,21 @@ class TestCase(APITestCase):
         self.assertEqual(response.data['title'], sample_data['title'])
         self.assertEqual(response.data['body'], sample_data['body'])
 
-    def test_post_creation_negative(self):
+    def test_post_creation_title_too_long(self):
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
         sample_data = {'title': 'Sample title that contains more than thirty characters', 'body': 'Sample content'}
+        response = self.client.post(reverse('posts'), sample_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_post_creation_title_empty(self):
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        sample_data = {'title': '', 'body': 'Sample content'}
+        response = self.client.post(reverse('posts'), sample_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_post_creation_body_empty(self):
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        sample_data = {'title': 'Sample title', 'body': ''}
         response = self.client.post(reverse('posts'), sample_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
