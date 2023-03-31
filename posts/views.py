@@ -21,6 +21,16 @@ class AddPostSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'body']
 
 
+class PutPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'body']
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.body = validated_data.get('title', instance.title)
+
+
 class GetPostSerializer(serializers.ModelSerializer):
     user = UsersSerializer(read_only=True)
 
@@ -39,6 +49,7 @@ class GetPostByIdSerializer(serializers.ModelSerializer):
 
 class Posts(ListCreateAPIView):
     model = Post
+
     authentication_classes = [authentication.TokenAuthentication]
 
     @extend_schema(
@@ -69,6 +80,29 @@ class Posts(ListCreateAPIView):
         Post.objects.create(title=data[0], body=data[1], user_id=data[2])
         return Response(data={'message': 'Object created!', 'title': data[0], 'body': data[1]},
                         status=status.HTTP_201_CREATED)
+
+    @extend_schema(
+        request=PutPostSerializer,
+        responses=PutPostSerializer,
+    )
+    def put(self, args, **kwargs):
+        try:
+            # id = kwargs['id']
+            title = self.request.data.get('title', '')
+            body = self.request.data.get('body', '')
+            if id is not None:
+                post = Post.objects.get(id=id)
+                serializer = PutPostSerializer(post, data={'title': title, 'body': body})
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(data={'message': 'Updated successfully!'})
+
+            # post_id = self.request.body
+            # serializer = AddPostSerializer(data={'id': post_id})
+            # serializer.is_valid(raise_exception=True)
+            # return Response(data={'post': post_id}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response(data={'message': 'Failed to update object!'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PostById(ListAPIView):

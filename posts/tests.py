@@ -2,13 +2,12 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
 
 from posts.models import Post
 
 
 class TestCase(APITestCase):
-    client_class = APIClient
 
     def setUp(self):
         self.user = User.objects.create_user(username='test_user',
@@ -18,10 +17,14 @@ class TestCase(APITestCase):
                                              is_active=1,
                                              password='password')
         Token.objects.create(user=self.user)
+        self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
         super(TestCase, self).setUp()
 
+    def test_can_read_user_detail(self):
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.get(reverse('post_by_id', kwargs={'id': self.post1.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-class TestPostCreation(TestCase):
     def test_post_creation(self):
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
         sample_data = {'title': 'Sample title', 'body': 'Sample content'}
@@ -35,17 +38,3 @@ class TestPostCreation(TestCase):
         sample_data = {'title': 'Sample title that contains more than thirty characters', 'body': 'Sample content'}
         response = self.client.post(reverse('posts'), sample_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-
-class TestGetPostFromId(TestCase):
-    def test_get_post_from_id(self):
-        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
-
-        self.post = Post.objects.create(id=1, title='Title of the post', body='Body of the post', user=self.user)
-        self.post = Post.objects.create(id=20, title='Title of the post', body='Body of the post', user=self.user)
-        self.post = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
-
-        post_id = 2
-        response = self.client.get(f'/posts/{post_id}')
-        print(response.__dict__)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
