@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import authentication
 from rest_framework import status, serializers
@@ -77,10 +78,7 @@ class PostById(ListAPIView):
     authentication_classes = [authentication.TokenAuthentication]
 
     def list(self, request, **kwargs):
-        try:
-            post_id = kwargs['id']
-            post = Post.objects.get(id=post_id)
-            serializer = GetPostByIdSerializer(post)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response(data={'message': 'Object does not exist!'}, status=status.HTTP_404_NOT_FOUND)
+        post_id = kwargs['id']
+        post = get_object_or_404(Post, id=post_id)
+        serializer = GetPostByIdSerializer(post)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)

@@ -29,7 +29,6 @@ class TestCase(APITestCase):
         self.assertEqual(response.data['user']['id'], self.user.id)
         self.assertEqual(response.data['user']['username'], self.user.username)
 
-
     def test_can_read_post_detail_negative(self):
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
         response = self.client.get(reverse('post_by_id', kwargs={'id': 2}))
