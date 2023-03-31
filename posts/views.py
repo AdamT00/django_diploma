@@ -81,29 +81,6 @@ class Posts(ListCreateAPIView):
         return Response(data={'message': 'Object created!', 'title': data[0], 'body': data[1]},
                         status=status.HTTP_201_CREATED)
 
-    @extend_schema(
-        request=PutPostSerializer,
-        responses=PutPostSerializer,
-    )
-    def put(self, args, **kwargs):
-        try:
-            # id = kwargs['id']
-            title = self.request.data.get('title', '')
-            body = self.request.data.get('body', '')
-            if id is not None:
-                post = Post.objects.get(id=id)
-                serializer = PutPostSerializer(post, data={'title': title, 'body': body})
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(data={'message': 'Updated successfully!'})
-
-            # post_id = self.request.body
-            # serializer = AddPostSerializer(data={'id': post_id})
-            # serializer.is_valid(raise_exception=True)
-            # return Response(data={'post': post_id}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception:
-            return Response(data={'message': 'Failed to update object!'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 class PostById(ListAPIView):
     model = Post
