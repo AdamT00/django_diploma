@@ -2,11 +2,12 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
+
+from posts.models import Post
 
 
 class TestCase(APITestCase):
-    client_class = APIClient
 
     def setUp(self):
         self.user = User.objects.create_user(username='test_user',
@@ -18,8 +19,21 @@ class TestCase(APITestCase):
         Token.objects.create(user=self.user)
         super(TestCase, self).setUp()
 
+    def test_can_read_post_detail(self):
+        self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.get(reverse('post_by_id', kwargs={'id': self.post1.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['title'], self.post1.title)
+        self.assertEqual(response.data['body'], self.post1.body)
+        self.assertEqual(response.data['user']['id'], self.user.id)
+        self.assertEqual(response.data['user']['username'], self.user.username)
 
-class TestPostCreation(TestCase):
+    def test_can_read_post_detail_negative(self):
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.get(reverse('post_by_id', kwargs={'id': 2}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_post_creation(self):
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
         sample_data = {'title': 'Sample title', 'body': 'Sample content'}
