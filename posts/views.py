@@ -72,9 +72,8 @@ class Posts(ListCreateAPIView):
             return Response(data={'message': 'Failed to create object!'}, status=status.HTTP_400_BAD_REQUEST)
 
     def insert_post(self, data):
-        Post.objects.create(title=data[0], body=data[1], user_id=data[2])
-        return Response(data={'id': Post.objects.last().id, 'title': data[0], 'body': data[1]},
-                        status=status.HTTP_201_CREATED)
+        post = Post.objects.create(title=data[0], body=data[1], user_id=data[2])
+        return Response(data=AddPostSerializer(post).data, status=status.HTTP_201_CREATED)
 
 
 class PostById(ListAPIView):
