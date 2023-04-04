@@ -73,7 +73,7 @@ class Posts(ListCreateAPIView):
 
     def insert_post(self, data):
         Post.objects.create(title=data[0], body=data[1], user_id=data[2])
-        return Response(data={'message': 'Object created!', 'title': data[0], 'body': data[1]},
+        return Response(data={'id': Post.objects.last().id, 'title': data[0], 'body': data[1]},
                         status=status.HTTP_201_CREATED)
 
 

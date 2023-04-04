@@ -55,9 +55,9 @@ class TestCase(APITestCase):
         sample_data = {'title': 'Sample title', 'body': 'Sample content'}
         response = self.client.post(reverse('posts'), sample_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data[0]['message'], 'Object created!')
-        self.assertEqual(response.data[1]['title'], sample_data['title'])
-        self.assertEqual(response.data[1]['body'], sample_data['body'])
+        self.assertEqual(response.data['id'], Post.objects.last().id)
+        self.assertEqual(response.data['title'], sample_data['title'])
+        self.assertEqual(response.data['body'], sample_data['body'])
 
     def test_post_creation_title_too_long(self):
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
