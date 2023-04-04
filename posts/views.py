@@ -1,10 +1,9 @@
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import authentication
 from rest_framework import status, serializers
-from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.response import Response
 
 from posts.models import Post
@@ -73,9 +72,8 @@ class Posts(ListCreateAPIView):
             return Response(data={'message': 'Failed to create object!'}, status=status.HTTP_400_BAD_REQUEST)
 
     def insert_post(self, data):
-        Post.objects.create(title=data[0], body=data[1], user_id=data[2])
-        return Response(data={'message': 'Object created!', 'title': data[0], 'body': data[1]},
-                        status=status.HTTP_201_CREATED)
+        post = Post.objects.create(title=data[0], body=data[1], user_id=data[2])
+        return Response(data=AddPostSerializer(post).data, status=status.HTTP_201_CREATED)
 
 
 class PostById(ListAPIView):
