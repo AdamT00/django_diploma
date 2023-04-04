@@ -19,6 +19,22 @@ class TestCase(APITestCase):
         Token.objects.create(user=self.user)
         super(TestCase, self).setUp()
 
+    def test_read_all_posts(self):
+        self.post1 = Post.objects.create(title='Title of post one', body='Body of the post', user=self.user)
+        self.post2 = Post.objects.create(title='Title of post two', body='Body of the post', user=self.user)
+        self.post3 = Post.objects.create(title='Title of post three', body='Body of the post', user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.get(reverse('posts'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data[0]['title'], self.post1.title)
+        self.assertEqual(response.data[1]['title'], self.post2.title)
+        self.assertEqual(response.data[2]['title'], self.post3.title)
+
+        for i in range(3):
+            self.assertEqual(response.data[i]['user']['id'], self.user.id)
+            self.assertEqual(response.data[i]['user']['username'], self.user.username)
+
     def test_read_post_detail(self):
         self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
@@ -39,8 +55,9 @@ class TestCase(APITestCase):
         sample_data = {'title': 'Sample title', 'body': 'Sample content'}
         response = self.client.post(reverse('posts'), sample_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['title'], sample_data['title'])
-        self.assertEqual(response.data['body'], sample_data['body'])
+        self.assertEqual(response.data[0]['message'], 'Object created!')
+        self.assertEqual(response.data[1]['title'], sample_data['title'])
+        self.assertEqual(response.data[1]['body'], sample_data['body'])
 
     def test_post_creation_title_too_long(self):
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
