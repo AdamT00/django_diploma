@@ -50,6 +50,11 @@ class TestCase(APITestCase):
         response = self.client.get(reverse('post_by_id', kwargs={'id': 123}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_read_post_detail_negative_id(self):
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.get(reverse('post_by_id', kwargs={'id': -1}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_post_creation(self):
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
         sample_data = {'title': 'Sample title', 'body': 'Sample content'}
@@ -125,6 +130,16 @@ class TestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
         response = self.client.put(
             reverse('post_by_id', kwargs={'id': 123}),
+            data={'title': 'Sample title', 'body': 'Sample body'},
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_post_update_negative_id(self):
+        self.post1 = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.put(
+            reverse('post_by_id', kwargs={'id': -1}),
             data={'title': 'Sample title', 'body': 'Sample body'},
             content_type='application/json'
         )
