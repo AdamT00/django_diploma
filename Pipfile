@@ -7,6 +7,7 @@ name = "pypi"
 django = "*"
 pytz = "*"
 djangorestframework = "*"
+python-dotenv = "*"
 drf-spectacular = {extras = ["sidecar"], version = "*"}
 
 [dev-packages]

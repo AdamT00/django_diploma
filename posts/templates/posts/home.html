@@ -1,0 +1,16 @@
+{% extends 'posts/index.html' %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold">Home Page</h1>
+    <p class="text-lg text-emerald-800">{{ user }}</p>
+    <div class="indicator">
+        <span class="indicator-item badge badge-secondary">New</span>
+        <div class="grid w-32 h-32 bg-base-300 place-items-center">content</div>
+    </div>
+    <ul>
+    {% for item in posts %}
+        <li>{{ item.title }}</li>
+    {% endfor %}
+    </ul>
+    <p>{{ posts.title }}</p>
+{% endblock %}

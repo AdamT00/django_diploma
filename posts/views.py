@@ -5,6 +5,8 @@ from rest_framework import authentication
 from rest_framework import status, serializers
 from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.response import Response
+from django.template.loader import render_to_string
+from django.http import HttpResponse
 
 from posts.models import Post
 
@@ -101,3 +103,15 @@ class PostById(ListAPIView):
             raise ValueError
         except ValueError:
             return Response(data={'message': 'Failed to update object!'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def home_view(request):
+    current_user = request.user
+    all_posts = Post.objects.all()
+    context = {
+        'posts': all_posts,
+        'user': current_user.email,
+    }
+
+    html_string = render_to_string("posts/home.html", context=context)
+    return HttpResponse(html_string)

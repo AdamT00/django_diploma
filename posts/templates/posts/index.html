@@ -1,0 +1,19 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static "posts/css/output.css" %}">
+</head>
+<body>
+    <div id="main-content" class="bg-white dark:bg-slate-800 dark:text-amber-50 rounded-lg px-6 py-8 ring-2 ring-slate-900/5 shadow-xl max-w-md m-auto mt-4">
+        {% block content %}
+
+        {% endblock %}
+    </div>
+</body>
+</html>
