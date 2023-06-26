@@ -1,0 +1,44 @@
+{% extends 'posts/index.html' %}
+
+{% block content %}
+    <div class="flex flex-wrap">
+        <form name="login-form" id="login-form" action="/login-user/" method="post" class="flex-1">
+            {% csrf_token %}
+            <h1 class="text-3xl">Login</h1>
+            <div class="form-control w-full max-w-xs">
+                <label class="label" for="username">
+                    <span class="label-text">Username</span>
+                </label>
+                <input type="text" id="username" name="username" placeholder="Type here" class="input input-bordered w-full max-w-xs mb-4" required/>
+                <label class="label" for="password">
+                    <span class="label-text">Password</span>
+                </label>
+                <input type="password" id="password" name="password" placeholder="Type here" class="input input-bordered w-full max-w-xs mb-4" required/>
+                <input class="btn" type="submit" value="Login">
+            </div>
+        </form>
+        <form name="register-form" id="register-form" action="/create-user/" method="post" class="flex-1">
+            {% csrf_token %}
+            <h1 class="text-3xl">Register</h1>
+            <div class="form-control w-full max-w-xs">
+                <label class="label" for="username-reg">
+                    <span class="label-text">Username</span>
+                </label>
+                <input type="text" id="username_reg" name="username-reg" placeholder="Type here" class="input input-bordered w-full max-w-xs mb-4" required/>
+                <label class="label" for="email-reg">
+                    <span class="label-text">Email Address</span>
+                </label>
+                <input type="email" id="email-reg" name="email-reg" placeholder="Type here" class="input input-bordered w-full max-w-xs mb-4" required/>
+                <label class="label" for="password-reg">
+                    <span class="label-text">Password</span>
+                </label>
+                <input type="password" id="password-reg" name="password-reg" placeholder="Type here" class="input input-bordered w-full max-w-xs mb-4" required/>
+                <label class="label" for="confirm-password">
+                    <span class="label-text">Confirm Password</span>
+                </label>
+                <input type="password" id="confirm-password" name="confirm-password" placeholder="Type here" class="input input-bordered w-full max-w-xs mb-4" required/>
+                <input class="btn" type="submit" value="Register">
+            </div>
+        </form>
+    </div>
+{% endblock %}

@@ -7,6 +7,15 @@ from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.response import Response
 from django.template.loader import render_to_string
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_protect
+from django.shortcuts import render
+from django.contrib.auth import authenticate, login
+from django.template import RequestContext
+from django.contrib.auth.decorators import login_required
+
+from .forms import LoginUser
+from .forms import RegisterUser
+
 
 from posts.models import Post
 
@@ -109,9 +118,90 @@ def home_view(request):
     current_user = request.user
     all_posts = Post.objects.all()
     context = {
-        'posts': all_posts,
+        'posts': all_posts[:5],
         'user': current_user.email,
     }
 
     html_string = render_to_string("posts/home.html", context=context)
     return HttpResponse(html_string)
+
+
+def contact_view(request):
+    current_user = request.user
+    all_posts = Post.objects.all()
+    context = {
+        'posts': all_posts,
+        'user': current_user.email,
+    }
+
+    html_string = render_to_string("posts/contact.html", context=context)
+    return HttpResponse(html_string)
+
+
+def profile_view(request):
+    if request.user.is_authenticated:
+        return render(request, 'posts/profile.html')
+    else:
+        return render(request, 'posts/login_register.html')
+
+
+def posts_view(request):
+    current_user = request.user
+    all_posts = Post.objects.all()
+    context = {
+        'posts': all_posts,
+        'user': current_user.email,
+    }
+
+    html_string = render_to_string("posts/posts_list.html", context=context)
+    return HttpResponse(html_string)
+
+
+def login_register_view(request):
+
+    context = {
+    }
+
+    return render(request, "posts/login_register.html")
+
+
+@csrf_protect
+def create_user(request):
+    if request.POST.get('password-reg') == request.POST.get('confirm-password') and len(request.POST.get('password-reg')) >= 8:
+        user = User.objects.create_user(
+            request.POST.get('username-reg', ''),
+            request.POST.get('email-reg', ''),
+            request.POST.get('password-reg', '')
+        )
+        user.save()
+        return render(request, 'posts/profile.html')
+    else:
+        context = {
+            'error': 'Error! Passwords dont match!',
+        }
+        return render(request, 'posts/login_register.html', context)
+
+
+@csrf_protect
+def login_user(request):
+    username = request.POST.get('username', '')
+    password = request.POST.get('password', '')
+
+    user = authenticate(request, username=username, password=password)
+
+    if user is not None:
+        login(request, user)
+        context = {
+            'username': username,
+            'password': password,
+            'user': user,
+        }
+        return render(request, 'posts/profile.html', context)
+    else:
+        context = {
+            'error': 'Error! Invalid username or password!',
+        }
+        return render(request, 'posts/login_register.html', context)
+
+
+

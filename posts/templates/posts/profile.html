@@ -1,0 +1,9 @@
+{% extends 'posts/index.html' %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+    <p>Successful login</p>
+    <p>{{ username }}</p>
+    <p>{{ password }}</p>
+    {% endif %}
+{% endblock %}
