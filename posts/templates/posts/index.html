@@ -51,22 +51,25 @@
     </div>
     <div class="navbar-end">
         {% if user.is_authenticated %}
-        <ul class="menu menu-horizontal px-1">
-            <li tabindex="0">
-                {{ user.email }}
-            </li>
-        </ul>
+            <ul class="menu menu-horizontal px-1">
+                <li>
+                    <a href="{% url 'profile' %}">Profile</a>
+                </li>
+                <li>
+                    <a href="{% url 'logout-user' %}">Logout</a>
+                </li>
+            </ul>
         {% else %}
-        <ul class="menu menu-horizontal px-1">
-            <li tabindex="0">
-                <details>
-                    <summary>Profile</summary>
-                    <ul class="p-2">
-                        <li><a href="/login-register">Login</a></li>
-                    </ul>
-                </details>
-            </li>
-        </ul>
+            <ul class="menu menu-horizontal px-1">
+                <li tabindex="0">
+                    <details>
+                        <summary>Profile</summary>
+                        <ul class="p-2">
+                            <li><a href="{% url 'login-register' %}">Login</a></li>
+                        </ul>
+                    </details>
+                </li>
+            </ul>
         {% endif %}
     </div>
 </div>
@@ -78,8 +81,9 @@
 </div>
 <footer class="footer footer-center mt-4 p-4 bg-base-100 text-base-content">
     <div>
-        <p>Copyright © 2023 - All right reserved by Adam Tolcser</p>
+        <p>Copyright © {% now "Y"  %} - All right reserved by Adam Tolcser</p>
     </div>
 </footer>
+<script src="{% static 'posts/js/script.js' %}"></script>
 </body>
 </html>

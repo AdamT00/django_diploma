@@ -2,8 +2,65 @@
 
 {% block content %}
     {% if user.is_authenticated %}
-    <p>Successful login</p>
-    <p>{{ username }}</p>
-    <p>{{ password }}</p>
+        {% if message %}
+            <div class="alert alert-success mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>{{ message }}</span>
+            </div>
+        {% elif error %}
+            <div class="alert alert-error mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>{{ error }}</span>
+            </div>
+        {% endif %}
+        <div class="w-2/3 mx-auto max-lg:w-full">
+            <h1 class="text-3xl">Personal Settings</h1>
+            <hr class="border-primary">
+            <table class="mt-4">
+                <tr>
+                    <td class="pr-4">Email</td>
+                    <td><input class="input input-bordered h-8 mr-2 max-sm:mt-2" type="email" disabled
+                               value="{{ user.email }}"></td>
+                </tr>
+                <tr>
+                    <td class="pr-4">Username</td>
+                    <td><input class="input input-bordered h-8 mr-2 max-sm:mt-2" type="text" disabled
+                               value="{{ user }}"></td>
+                </tr>
+                <tr>
+                    <td class="pr-4">Password</td>
+                    <td>
+                        <form action="{% url 'password-reset' %}" method="post">
+                            {% csrf_token %}
+                            <input placeholder="Type current password" class="input input-bordered h-8 mr-2 max-sm:mt-2"
+                                   required
+                                   type="password" name="password_old">
+                            <input placeholder="New password" class="input input-bordered h-8 mr-2 max-sm:mt-2" required
+                                   type="password" name="password_new1">
+                            <input placeholder="Retype new password" class="input input-bordered h-8 mr-2 max-sm:mt-2"
+                                   required
+                                   type="password" name="password_new2">
+                            <input type="submit" value="Change Password" class="btn h-4 max-md:my-2">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        <hr class="border-primary mt-4 mb-4">
+        <table>
+            <tr>
+                <td>API key</td>
+                <td><input id="api-key" type="text" class="input input-bordered h-8 mr-2 max-sm:mt-2" disabled></td>
+            </tr>
+        </table>
+        </div>
+
     {% endif %}
 {% endblock %}

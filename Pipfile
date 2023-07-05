@@ -9,6 +9,7 @@ pytz = "*"
 djangorestframework = "*"
 python-dotenv = "*"
 drf-spectacular = {extras = ["sidecar"], version = "*"}
+passlib = "*"
 
 [dev-packages]
 

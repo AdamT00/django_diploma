@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_protect
-from django.shortcuts import render
-from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 
@@ -115,42 +115,45 @@ class PostById(ListAPIView):
 
 
 def home_view(request):
-    current_user = request.user
     all_posts = Post.objects.all()
     context = {
         'posts': all_posts[:5],
-        'user': current_user.email,
+        'user': request.user if request.user.is_authenticated else None,
     }
 
-    html_string = render_to_string("posts/home.html", context=context)
+    html_string = render_to_string('posts/home.html', context=context)
     return HttpResponse(html_string)
 
 
 def contact_view(request):
-    current_user = request.user
     all_posts = Post.objects.all()
     context = {
         'posts': all_posts,
-        'user': current_user.email,
+        'user': request.user if request.user.is_authenticated else None,
     }
 
-    html_string = render_to_string("posts/contact.html", context=context)
+    html_string = render_to_string('posts/contact.html', context=context)
     return HttpResponse(html_string)
 
 
+@login_required
 def profile_view(request):
-    if request.user.is_authenticated:
-        return render(request, 'posts/profile.html')
-    else:
-        return render(request, 'posts/login_register.html')
+    context = {
+        'user': request.user,
+    }
+    return render(request, 'posts/profile.html', context=context)
+    # if request.user.is_authenticated:
+    #     return render(request, 'posts/profile.html')
+    # else:
+    #     return render(request, 'posts/login.html')
 
 
 def posts_view(request):
-    current_user = request.user
     all_posts = Post.objects.all()
+
     context = {
         'posts': all_posts,
-        'user': current_user.email,
+        'user': request.user if request.user.is_authenticated else None,
     }
 
     html_string = render_to_string("posts/posts_list.html", context=context)
@@ -158,11 +161,7 @@ def posts_view(request):
 
 
 def login_register_view(request):
-
-    context = {
-    }
-
-    return render(request, "posts/login_register.html")
+    return render(request, 'posts/login.html')
 
 
 @csrf_protect
@@ -174,12 +173,16 @@ def create_user(request):
             request.POST.get('password-reg', '')
         )
         user.save()
-        return render(request, 'posts/profile.html')
+        context = {
+            'user': user,
+        }
+        login(request, user)
+        return render(request, 'posts/profile.html', context)
     else:
         context = {
-            'error': 'Error! Passwords dont match!',
+            'error': 'Error! Passwords do not match!',
         }
-        return render(request, 'posts/login_register.html', context)
+        return render(request, 'posts/login.html', context)
 
 
 @csrf_protect
@@ -192,8 +195,6 @@ def login_user(request):
     if user is not None:
         login(request, user)
         context = {
-            'username': username,
-            'password': password,
             'user': user,
         }
         return render(request, 'posts/profile.html', context)
@@ -201,7 +202,53 @@ def login_user(request):
         context = {
             'error': 'Error! Invalid username or password!',
         }
-        return render(request, 'posts/login_register.html', context)
+        return render(request, 'posts/login.html', context)
 
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect('/')
+
+
+@login_required
+def password_reset(request):
+    user = request.user
+    password_old_input = request.POST.get('password_old', '')
+    password_new1 = request.POST.get('password_new1', '')
+    password_new2 = request.POST.get('password_new2', '')
+
+    if len(password_old_input) < 8:
+        context = {
+            'user': user,
+            'error': 'Failed to change password! Password must be at least 8 characters long.'
+        }
+        return render(request, 'posts/profile.html', context)
+
+    if password_new1 == password_new2:
+        password = password_new1
+    else:
+        context = {
+            'user': user,
+            'error': 'Failed to change password! Passwords do not match.'
+        }
+        return render(request, 'posts/profile.html', context)
+
+    if authenticate(username=user.username, password=password_old_input):
+        user.set_password(password)
+        user.save()
+
+        context = {
+            'user': user,
+            'message': 'Password has been changed successfully.'
+        }
+
+        return render(request, 'posts/profile.html', context)
+    else:
+        context = {
+            'user': user,
+            'error': 'Failed to change password! Current password is incorrect.'
+        }
+        return render(request, 'posts/profile.html', context)
 
 
