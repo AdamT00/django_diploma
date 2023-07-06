@@ -10,6 +10,7 @@ djangorestframework = "*"
 python-dotenv = "*"
 drf-spectacular = {extras = ["sidecar"], version = "*"}
 passlib = "*"
+requests = "*"
 
 [dev-packages]
 

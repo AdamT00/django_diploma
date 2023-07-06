@@ -1,3 +1,4 @@
+import requests
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
@@ -139,13 +140,10 @@ def contact_view(request):
 @login_required
 def profile_view(request):
     context = {
+        'api_key': request.session.get('token', ''),
         'user': request.user,
     }
     return render(request, 'posts/profile.html', context=context)
-    # if request.user.is_authenticated:
-    #     return render(request, 'posts/profile.html')
-    # else:
-    #     return render(request, 'posts/login.html')
 
 
 def posts_view(request):
@@ -173,10 +171,21 @@ def create_user(request):
             request.POST.get('password-reg', '')
         )
         user.save()
+
+        login(request, user)
+        result = requests.post('http://127.0.0.1:8000/api-token-auth/',
+                               json={
+                                   'username': request.POST.get('username-reg', ''),
+                                   'password': request.POST.get('password-reg', '')
+                               })
+
+        request.session['token'] = result.json()['token']
+
         context = {
+            'api_key': request.session.get('token', ''),
             'user': user,
         }
-        login(request, user)
+
         return render(request, 'posts/profile.html', context)
     else:
         context = {
@@ -191,10 +200,13 @@ def login_user(request):
     password = request.POST.get('password', '')
 
     user = authenticate(request, username=username, password=password)
+    result = requests.post('http://127.0.0.1:8000/api-token-auth/', json={'username': username, 'password': password})
+    request.session['token'] = result.json()['token']
 
     if user is not None:
         login(request, user)
         context = {
+            'api_key': request.session.get('token', ''),
             'user': user,
         }
         return render(request, 'posts/profile.html', context)
