@@ -11,7 +11,6 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 
 from .forms import LoginUser
@@ -147,15 +146,51 @@ def profile_view(request):
 
 
 def posts_view(request):
-    all_posts = Post.objects.all()
+    all_posts = Post.objects.select_related('user')
 
     context = {
         'posts': all_posts,
         'user': request.user if request.user.is_authenticated else None,
     }
 
-    html_string = render_to_string("posts/posts_list.html", context=context)
-    return HttpResponse(html_string)
+    return render(request, 'posts/posts_list.html', context=context)
+
+
+def post_view(request, id):
+    post = Post.objects.get(id=id)
+    context = {
+        'post': post
+    }
+    return render(request, 'posts/post.html', context=context)
+
+
+def create_post(request):
+    title = request.POST.get('title', '')
+    body = request.POST.get('body', '')
+
+    if title is None:
+        context = {
+            'error': 'Title can not be empty.',
+            'posts': Post.objects.select_related('user')
+        }
+        return render(request, 'posts/posts_list.html', context)
+
+    if len(body) < 50:
+        context = {
+            'error': 'Body has to be at least 50 characters long.',
+            'posts': Post.objects.select_related('user')
+        }
+        return render(request, 'posts/posts_list.html', context)
+
+    post = Post(title=title, body=body, user_id=request.user.id)
+    post.save()
+
+    context = {
+        'message': 'Post created successfully!',
+        'posts': Post.objects.select_related('user')
+    }
+
+    return render(request, 'posts/posts_list.html', context)
 
 
 def login_register_view(request):
