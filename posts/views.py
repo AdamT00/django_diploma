@@ -172,7 +172,7 @@ def create_post(request):
 
     if title is None:
         context = {
-            'error': 'Title can not be empty.',
+            'error': 'Title cannot be empty.',
             'posts': Post.objects.select_related('user'),
             'title': title,
             'body': body,
@@ -202,23 +202,31 @@ def create_post(request):
 def create_comment(request):
     text = request.POST.get('text', '')
     post_id = request.POST.get('id', ''),
+    post_id = post_id[0]
 
     if text:
         comment = Comment(
             text=text,
-            post=Post.objects.get(pk=int(post_id[0])),
+            post=Post.objects.get(pk=post_id),
             user=request.user,
         )
         comment.save()
 
         context = {
+            'post': Post.objects.get(id=post_id),
+            'id': post_id,
             'message': 'Your comment has been posted.',
             'comments': Comment.objects.select_related('post', 'user').filter(post=post_id)
         }
 
         return render(request, 'posts/post.html', context)
     else:
-        return render(request, 'posts/login.html')
+        context = {
+            'post': Post.objects.get(id=post_id),
+            'id': post_id,
+            'error': 'Cannot post empty comment.',
+        }
+        return render(request, 'posts/post.html', context)
 
 
 def login_register_view(request):
@@ -325,5 +333,3 @@ def password_reset(request):
             'error': 'Failed to change password! Current password is incorrect.'
         }
         return render(request, 'posts/profile.html', context)
-
-
