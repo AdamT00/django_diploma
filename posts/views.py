@@ -17,7 +17,7 @@ from .forms import LoginUser
 from .forms import RegisterUser
 
 
-from posts.models import Post
+from posts.models import Post, Comment
 
 
 class UsersSerializer(serializers.ModelSerializer):
@@ -159,7 +159,9 @@ def posts_view(request):
 def post_view(request, id):
     post = Post.objects.get(id=id)
     context = {
-        'post': post
+        'post': post,
+        'id': id,
+        'comments': Comment.objects.select_related('post', 'user').filter(post=id),
     }
     return render(request, 'posts/post.html', context=context)
 
@@ -191,10 +193,32 @@ def create_post(request):
 
     context = {
         'message': 'Post created successfully!',
-        'posts': Post.objects.select_related('user')
+        'posts': Post.objects.select_related('user'),
     }
 
     return render(request, 'posts/posts_list.html', context)
+
+
+def create_comment(request):
+    text = request.POST.get('text', '')
+    post_id = request.POST.get('id', ''),
+
+    if text:
+        comment = Comment(
+            text=text,
+            post=Post.objects.get(pk=int(post_id[0])),
+            user=request.user,
+        )
+        comment.save()
+
+        context = {
+            'message': 'Your comment has been posted.',
+            'comments': Comment.objects.select_related('post', 'user').filter(post=post_id)
+        }
+
+        return render(request, 'posts/post.html', context)
+    else:
+        return render(request, 'posts/login.html')
 
 
 def login_register_view(request):

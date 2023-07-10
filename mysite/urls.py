@@ -20,6 +20,7 @@ urlpatterns = [
     path('login/', post_views.login_user, name='login-user'),
     path('logout/', post_views.logout_view, name='logout-user'),
     path('password-reset/', post_views.password_reset, name='password-reset'),
+    path('create-comment/', post_views.create_comment, name='create-comment'),
 
     path('accounts/', include("django.contrib.auth.urls")),
     path('accounts/login/', auth_views.LoginView.as_view),
