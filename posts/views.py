@@ -171,14 +171,18 @@ def create_post(request):
     if title is None:
         context = {
             'error': 'Title can not be empty.',
-            'posts': Post.objects.select_related('user')
+            'posts': Post.objects.select_related('user'),
+            'title': title,
+            'body': body,
         }
         return render(request, 'posts/posts_list.html', context)
 
     if len(body) < 50:
         context = {
             'error': 'Body has to be at least 50 characters long.',
-            'posts': Post.objects.select_related('user')
+            'posts': Post.objects.select_related('user'),
+            'title': title,
+            'body': body,
         }
         return render(request, 'posts/posts_list.html', context)
 

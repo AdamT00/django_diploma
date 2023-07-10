@@ -2,60 +2,65 @@
 
 {% block content %}
     {% if message %}
-            <div class="alert alert-success mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-                     viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>{{ message }}</span>
-            </div>
-        {% elif error %}
-            <div class="alert alert-error mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-                     viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>{{ error }}</span>
-            </div>
+        <div class="alert alert-success mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>{{ message }}</span>
+        </div>
+    {% elif error %}
+        <div class="alert alert-error mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>{{ error }}</span>
+        </div>
     {% endif %}
     <div class="w-2/3 mx-auto max-lg:w-full">
         <h1 class="text-3xl">View Posts</h1>
         <hr class="border-primary mt-4 mb-4">
         <div class="flex flex-wrap justify-center">
             {% for post in posts %}
-                <div class="bg-base-200 rounded-md p-4 w-fit mx-2 transition-all hover:bg-primary">
-                    <a href="{% url 'blog-post' post.id %}">
+                <a href="{% url 'blog-post' post.id %}">
+                    <div class="bg-base-200 rounded-md p-4 w-fit mx-2 transition-all hover:bg-primary">
                         <h3 class="text-xl">{{ post.title }}</h3>
                         <p class="text-left text-sm">{{ post.date_created }}</p>
                         <p class="text-right text-sm">{{ post.user.username }}</p>
-                    </a>
-                </div>
+                    </div>
+                </a>
             {% endfor %}
         </div>
-        <h1 class="text-3xl">Create New Post</h1>
-        <hr class="border-primary mt-4 mb-4">
-        <div>
-            <form action="{% url 'create-post' %}" method="post">
-                {% csrf_token %}
-                <table class="mx-auto text-center w-1/4 max-md:w-full">
-                    <tr>
-                        <td><input class="input input-bordered w-full mb-4 text-base" required type="text" name="title"
-                                   placeholder="Title of your post"></td>
-                    </tr>
-                    <tr>
-                        <td><textarea name="body" class="textarea input-bordered w-full mb-4 text-base" rows="5"
-                                      placeholder="Body of your post"></textarea></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="submit" value="Create Post" class="btn w-full">
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-
+        {% if user %}
+            <h1 class="text-3xl">Create New Post</h1>
+            <hr class="border-primary mt-4 mb-4">
+            <div>
+                <form action="{% url 'create-post' %}" method="post">
+                    {% csrf_token %}
+                    <table class="mx-auto text-center w-1/4 max-md:w-full">
+                        <tr>
+                            <td><input class="input input-bordered w-full mb-4 text-base" required type="text"
+                                       name="title"
+                                       placeholder="Title of your post" {% if title %} value="{{ title }}" {% endif %}>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <textarea name="body" class="textarea input-bordered w-full mb-4 text-base" rows="5"
+                                          placeholder="Body of your post">{% if body %}{{ body }}{% endif %}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="submit" value="Create Post" class="btn w-full">
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

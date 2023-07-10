@@ -1,5 +1,69 @@
 {% extends 'posts/index.html' %}
 
 {% block content %}
+    <div class="w-2/3 mx-auto max-lg:w-full">
+        <h1 class="text-3xl">{{ post.title }}</h1>
+        <div class="flex justify-between">
+            <span class="text-sm">Post created at <b>{{ post.date_created }}</b></span>
+            <span class="text-sm">Created by <b>{{ post.user }}</b></span>
+            <span class="text-sm">Last updated at <b>{{ post.date_updated }}</b></span>
+        </div>
+        <hr class="border-primary mt-4 mb-4">
+        <p>{{ post.body }}</p>
 
+        <div class="mt-16">
+            <div class="w-1/2 m-4 mx-auto border-2 border-primary rounded-md">
+                <div class="flex justify-between p-2 bg-primary">
+                    <a href="">#1</a>
+                    <span>Adam</span>
+                </div>
+                <div class="bg-base-200 px-2">
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consectetur, deserunt dolore, in
+                        maxime
+                        modi perspiciatis possimus quaerat quas quo rem reprehenderit sapiente sit ullam. Accusamus
+                        explicabo maiores necessitatibus nulla veniam.
+                    </p>
+                </div>
+                <div class="bg-base-200 p-2 border-primary border-t-2">
+                    <span>June 22, 2023, 4:36 p.m.</span>
+                </div>
+            </div>
+            <div class="w-1/2 m-4 mx-auto border-2 border-primary rounded-md">
+                <div class="flex justify-between p-2 bg-primary">
+                    <a href="">#1</a>
+                    <span>Adam</span>
+                </div>
+                <div class="bg-base-200 px-2">
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consectetur, deserunt dolore, in
+                        maxime
+                        modi perspiciatis possimus quaerat quas quo rem reprehenderit sapiente sit ullam. Accusamus
+                        explicabo maiores necessitatibus nulla veniam.
+                    </p>
+                </div>
+                <div class="bg-base-200 p-2 border-primary border-t-2">
+                    <span>June 22, 2023, 4:36 p.m.</span>
+                </div>
+            </div>
+            {% if user %}
+                <div>
+                    <form action="{% url 'create-post' %}" method="post">
+                        {% csrf_token %}
+                        <table class="mx-auto text-center w-1/4 max-md:w-full">
+                            <tr>
+                                <td><textarea name="body" class="textarea input-bordered w-full mb-4 text-base" rows="5"
+                                              placeholder="Type your comment here"></textarea></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="submit" value="Comment" class="btn w-full">
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
