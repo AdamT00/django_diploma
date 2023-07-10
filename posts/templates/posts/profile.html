@@ -1,5 +1,7 @@
 {% extends 'posts/index.html' %}
 
+{% block title %}Profile{% endblock %}
+
 {% block content %}
     {% if user.is_authenticated %}
         {% if message %}
