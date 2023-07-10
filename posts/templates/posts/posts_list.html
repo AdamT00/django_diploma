@@ -21,7 +21,18 @@
         </div>
     {% endif %}
     <div class="w-2/3 mx-auto max-lg:w-full">
-        <h1 class="text-3xl">View Posts</h1>
+        <div class="flex justify-between">
+            <h1 class="text-3xl">View Posts</h1>
+            <form action="/posts/" method="get">
+                <select class="select select-bordered w-full max-w-xs" name="sort" onchange="this.form.submit()">
+                    <option disabled selected>Sort by</option>
+                    <option value="creator">Creator</option>
+                    <option value="date_descending">Date - Newest First</option>
+                    <option value="date_ascending">Date - Oldest First</option>
+                    <option value="title">Title</option>
+                </select>
+            </form>
+        </div>
         <hr class="border-primary mt-4 mb-4">
         <div class="flex flex-wrap justify-center">
             {% for post in posts %}

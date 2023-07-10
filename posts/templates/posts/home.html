@@ -10,7 +10,7 @@
                 <h2 class="card-title">{{ item.title }}</h2>
                 <p>{{ item.body }}</p>
                 <div class="card-actions justify-end">
-                    <button class="btn">View Post</button>
+                    <a href="{% url 'blog-post' item.id %}" class="btn">View Post</a>
                 </div>
             </div>
         </div>

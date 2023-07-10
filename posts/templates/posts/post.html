@@ -47,7 +47,7 @@
                     </div>
                 </div>
             {% endfor %}
-            {% if user %}
+            {% if user.is_authenticated %}
                 <div>
                     <form action="{% url 'create-comment' %}" method="post">
                         {% csrf_token %}

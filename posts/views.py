@@ -16,7 +16,6 @@ from django.contrib.auth.decorators import login_required
 from .forms import LoginUser
 from .forms import RegisterUser
 
-
 from posts.models import Post, Comment
 
 
@@ -146,7 +145,19 @@ def profile_view(request):
 
 
 def posts_view(request):
+    sort = request.GET.get('sort', '')
     all_posts = Post.objects.select_related('user')
+
+    if sort == 'creator':
+        all_posts = Post.objects.select_related('user').order_by('user')
+    elif sort == 'date_ascending':
+        all_posts = Post.objects.select_related('user').order_by('date_created')
+    elif sort == 'date_descending':
+        all_posts = Post.objects.select_related('user').order_by('-date_created')
+    elif sort == 'title':
+        all_posts = Post.objects.select_related('user').order_by('title')
+    else:
+        all_posts = Post.objects.select_related('user').order_by('-date_created')
 
     context = {
         'posts': all_posts,
@@ -235,7 +246,8 @@ def login_register_view(request):
 
 @csrf_protect
 def create_user(request):
-    if request.POST.get('password-reg') == request.POST.get('confirm-password') and len(request.POST.get('password-reg')) >= 8:
+    if request.POST.get('password-reg') == request.POST.get('confirm-password') and len(
+            request.POST.get('password-reg')) >= 8:
         user = User.objects.create_user(
             request.POST.get('username-reg', ''),
             request.POST.get('email-reg', ''),
@@ -271,11 +283,12 @@ def login_user(request):
     password = request.POST.get('password', '')
 
     user = authenticate(request, username=username, password=password)
-    result = requests.post('http://127.0.0.1:8000/api-token-auth/', json={'username': username, 'password': password})
-    request.session['token'] = result.json()['token']
 
     if user is not None:
         login(request, user)
+        result = requests.post('http://127.0.0.1:8000/api-token-auth/',
+                               json={'username': username, 'password': password})
+        request.session['token'] = result.json()['token']
         context = {
             'api_key': request.session.get('token', ''),
             'user': user,
