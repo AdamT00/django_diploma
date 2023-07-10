@@ -146,7 +146,6 @@ def profile_view(request):
 
 def posts_view(request):
     sort = request.GET.get('sort', '')
-    all_posts = Post.objects.select_related('user')
 
     if sort == 'creator':
         all_posts = Post.objects.select_related('user').order_by('user')
