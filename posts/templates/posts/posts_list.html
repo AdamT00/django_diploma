@@ -39,7 +39,7 @@
         <div class="flex flex-wrap justify-center">
             {% for post in posts %}
                 <a href="{% url 'blog-post' post.id %}">
-                    <div class="bg-base-200 rounded-md p-4 w-fit mx-2 transition-all hover:bg-primary">
+                    <div class="bg-base-200 rounded-md p-4 w-fit mx-2 mb-4 transition-all hover:bg-primary">
                         <h3 class="text-xl">{{ post.title }}</h3>
                         <p class="text-left text-sm">{{ post.date_created }}</p>
                         <p class="text-right text-sm">{{ post.user.username }}</p>

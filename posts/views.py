@@ -6,6 +6,7 @@ from rest_framework import authentication
 from rest_framework import status, serializers
 from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_protect
@@ -51,6 +52,36 @@ class PutPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'title', 'body']
+
+
+class GetPostShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id', 'title']
+
+
+class GetCommentsSerializer(serializers.ModelSerializer):
+    user = UsersSerializer(read_only=True)
+    post = GetPostShortSerializer()
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'post', 'user']
+
+
+class GetCommentByIdSerializer(serializers.ModelSerializer):
+    user = UsersSerializer(read_only=True)
+    post = GetPostShortSerializer()
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'post', 'text', 'user', 'date_created']
+
+
+class AddCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'text', 'post', 'user']
 
 
 class Posts(ListCreateAPIView):
@@ -111,6 +142,51 @@ class PostById(ListAPIView):
             raise ValueError
         except ValueError:
             return Response(data={'message': 'Failed to update object!'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Comments(ListCreateAPIView):
+    model = Comment
+    authentication_classes = [authentication.TokenAuthentication]
+
+    @extend_schema(
+        request=GetCommentsSerializer,
+        responses=GetCommentsSerializer,
+    )
+    def list(self, request):
+        all_comments = Comment.objects.all()
+        serializer = GetCommentsSerializer(all_comments, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=AddCommentSerializer,
+        responses=AddCommentSerializer,
+    )
+    def post(self, args, **kwargs):
+        try:
+            text = self.request.data.get('text', '')
+            post_id = self.request.data.get('post', '')
+            user = self.request.user
+            post = get_object_or_404(Post, post_id)
+            serializer = AddCommentSerializer(data={'text': text, 'post': post})
+            serializer.is_valid(raise_exception=True)
+            return self.insert_comment([text, post, user])
+        except Exception:
+            return Response(data={'message': 'Failed to create object!'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def insert_comment(self, data):
+        comment = Comment.objects.create(text=data[0], post=data[1], user=data[2])
+        return Response(data=AddCommentSerializer(comment).data, status=status.HTTP_201_CREATED)
+
+
+class CommentById(ListAPIView):
+    model = Comment
+    authentication_classes = [authentication.TokenAuthentication]
+
+    def list(self, request, **kwargs):
+        comment_id = kwargs['id']
+        comment = get_object_or_404(Comment, id=comment_id)
+        serializer = GetCommentByIdSerializer(comment)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 def home_view(request):

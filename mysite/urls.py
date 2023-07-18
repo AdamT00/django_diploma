@@ -31,4 +31,7 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('api-token-auth/', views.obtain_auth_token),
     path('post/', include('posts.urls')),
+
+    path('comment/', post_views.Comments.as_view(), name='comments'),
+    path('comment/<int:id>/', post_views.CommentById.as_view(), name='comment_by_id'),
 ]
