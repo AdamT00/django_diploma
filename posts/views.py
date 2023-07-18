@@ -74,11 +74,12 @@ class GetCommentByIdSerializer(serializers.ModelSerializer):
     post = GetPostShortSerializer()
 
     class Meta:
-        model = Comment
         fields = ['id', 'post', 'text', 'user', 'date_created']
 
 
 class AddCommentSerializer(serializers.ModelSerializer):
+    user = UsersSerializer(read_only=True)
+
     class Meta:
         model = Comment
         fields = ['id', 'text', 'post', 'user']
@@ -165,11 +166,10 @@ class Comments(ListCreateAPIView):
         try:
             text = self.request.data.get('text', '')
             post_id = self.request.data.get('post', '')
-            user = self.request.user
-            post = get_object_or_404(Post, post_id)
-            serializer = AddCommentSerializer(data={'text': text, 'post': post})
+            post = get_object_or_404(Post, pk=post_id)
+            serializer = AddCommentSerializer(data=self.request.data)
             serializer.is_valid(raise_exception=True)
-            return self.insert_comment([text, post, user])
+            return self.insert_comment([text, post, self.request.user])
         except Exception:
             return Response(data={'message': 'Failed to create object!'}, status=status.HTTP_400_BAD_REQUEST)
 

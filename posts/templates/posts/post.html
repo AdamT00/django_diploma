@@ -34,9 +34,9 @@
 
         <div class="mt-16">
             {% for comment in comments %}
-                <div class="w-1/2 m-4 mx-auto border-2 border-primary rounded-md max-lg:w-full">
+                <div id="comment{{ forloop.counter }}" class="w-1/2 m-4 mx-auto border-2 border-primary rounded-md max-lg:w-full">
                     <div class="flex justify-between p-2 bg-primary">
-                        <a href="">#{{ forloop.counter }}</a>
+                        <a href="{% url 'blog-post' post.id %}#comment{{ forloop.counter }}">#{{ forloop.counter }}</a>
                         <span>{{ comment.user }}</span>
                     </div>
                     <div class="bg-base-200 p-2 rounded-md">
