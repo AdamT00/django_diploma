@@ -243,6 +243,7 @@ def profile_view(request):
     context = {
         'api_key': request.session.get('token', ''),
         'user': request.user,
+        'posts': Post.objects.filter(user=request.user),
     }
     return render(request, 'posts/profile.html', context=context)
 
@@ -394,6 +395,7 @@ def login_user(request):
         context = {
             'api_key': request.session.get('token', ''),
             'user': user,
+            'posts': Post.objects.filter(user=request.user),
         }
         return render(request, 'posts/profile.html', context)
     else:

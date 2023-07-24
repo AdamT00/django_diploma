@@ -63,5 +63,21 @@
                 </tr>
             </table>
         </div>
+        <div class="w-2/3 mx-auto max-lg:w-full mt-4">
+            <h1 class="text-3xl">My Posts</h1>
+            <hr class="border-primary mb-4">
+            {% for post in posts %}
+                <a href="{% url 'blog-post' post.id %}" class="flex bg-base-200 hover:bg-primary p-2 rounded-lg justify-between mb-4 transition-all">
+                    <div>
+                        {{ post.title }}
+                    </div>
+                    <div>
+                        {{ post.date_created }}
+                    </div>
+                </a>
+            {% empty %}
+                <p><i>You haven't created any posts yet.</i></p>
+            {% endfor  %}
+        </div>
     {% endif %}
 {% endblock %}
