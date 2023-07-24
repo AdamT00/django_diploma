@@ -75,7 +75,7 @@ class GetCommentByIdSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['id', 'post', 'text', 'user', 'date_created']
+        fields = ['id', 'post', 'text', 'user', 'date_created', 'date_updated']
 
 
 class AddCommentSerializer(serializers.ModelSerializer):
@@ -84,6 +84,12 @@ class AddCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['id', 'text', 'post', 'user']
+
+
+class PutCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'text']
 
 
 class Posts(ListCreateAPIView):
@@ -192,6 +198,22 @@ class CommentById(ListAPIView):
         comment = get_object_or_404(Comment, id=comment_id)
         serializer = GetCommentByIdSerializer(comment)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=PutCommentSerializer,
+        responses=PutCommentSerializer,
+    )
+    def put(self, request, **kwargs):
+        try:
+            comment_id = kwargs['id']
+            comment = get_object_or_404(Comment, id=comment_id)
+            serializer = PutCommentSerializer(comment, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(data=serializer.data, status=status.HTTP_200_OK)
+            raise ValueError
+        except ValueError:
+            return Response(data={'message': 'Failed to update object!'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def home_view(request):
