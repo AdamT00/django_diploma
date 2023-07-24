@@ -208,7 +208,7 @@ class CommentById(ListAPIView):
             comment_id = kwargs['id']
             comment = get_object_or_404(Comment, id=comment_id)
             serializer = PutCommentSerializer(comment, data=request.data)
-            if serializer.is_valid():
+            if serializer.is_valid() and request.user == comment.user:
                 serializer.save()
                 return Response(data=serializer.data, status=status.HTTP_200_OK)
             raise ValueError
