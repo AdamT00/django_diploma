@@ -53,7 +53,7 @@
             <div>
                 <form action="{% url 'create-post' %}" method="post">
                     {% csrf_token %}
-                    <table class="mx-auto text-center w-1/4 max-md:w-full">
+                    <table class="mx-auto text-center w-1/4 max-lg:w-full">
                         <tr>
                             <td><input class="input input-bordered w-full mb-4 text-base" required type="text"
                                        name="title"

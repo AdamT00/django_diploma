@@ -34,10 +34,18 @@
 
         <div class="mt-16">
             {% for comment in comments %}
-                <div id="comment{{ forloop.counter }}" class="w-1/2 m-4 mx-auto border-2 border-primary rounded-md max-lg:w-full">
+                <div id="comment{{ forloop.counter }}"
+                     class="w-1/2 m-4 mx-auto border-2 border-primary rounded-md max-lg:w-full">
                     <div class="flex justify-between p-2 bg-primary">
                         <a href="{% url 'blog-post' post.id %}#comment{{ forloop.counter }}">#{{ forloop.counter }}</a>
-                        <span>{{ comment.user }}</span>
+                        <div class="flex items-center">
+                            {% if comment.user == post.user %}
+                                <h3 class="text-lg">
+                                    <span class="badge badge-md">CREATOR</span>
+                                </h3>
+                            {% endif %}
+                            <span class="ml-2">{{ comment.user }}</span>
+                        </div>
                     </div>
                     <div class="bg-base-200 p-2 rounded-md">
                         <p>

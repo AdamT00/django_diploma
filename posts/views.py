@@ -74,6 +74,7 @@ class GetCommentByIdSerializer(serializers.ModelSerializer):
     post = GetPostShortSerializer()
 
     class Meta:
+        model = Comment
         fields = ['id', 'post', 'text', 'user', 'date_created']
 
 
@@ -182,6 +183,10 @@ class CommentById(ListAPIView):
     model = Comment
     authentication_classes = [authentication.TokenAuthentication]
 
+    @extend_schema(
+        request=GetCommentByIdSerializer,
+        responses=GetCommentByIdSerializer,
+    )
     def list(self, request, **kwargs):
         comment_id = kwargs['id']
         comment = get_object_or_404(Comment, id=comment_id)
@@ -190,9 +195,9 @@ class CommentById(ListAPIView):
 
 
 def home_view(request):
-    all_posts = Post.objects.all()
+    all_posts = Post.objects.all().order_by('-date_updated')[:5]
     context = {
-        'posts': all_posts[:5],
+        'posts': all_posts,
         'user': request.user if request.user.is_authenticated else None,
     }
 

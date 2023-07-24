@@ -8,7 +8,7 @@
             <div class="card-body">
                 <span class="text-xs font-bold text-right">{{ item.user }}</span>
                 <h2 class="card-title">{{ item.title }}</h2>
-                <p>{{ item.body }}</p>
+                <p class="text-ellipsis overflow-hidden h-16">{{ item.body }}</p>
                 <div class="card-actions justify-end">
                     <a href="{% url 'blog-post' item.id %}" class="btn">View Post</a>
                 </div>

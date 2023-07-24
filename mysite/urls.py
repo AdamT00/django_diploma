@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.contrib.auth import views as auth_views
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken import views
@@ -33,5 +33,5 @@ urlpatterns = [
     path('post/', include('posts.urls')),
 
     path('comment/', post_views.Comments.as_view(), name='comments'),
-    path('comment/<int:id>/', post_views.CommentById.as_view(), name='comment_by_id'),
+    re_path('comment/(?P<id>-*[0-9]+)/\\Z', post_views.CommentById.as_view(), name='comment_by_id'),
 ]

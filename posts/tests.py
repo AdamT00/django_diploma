@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
-from posts.models import Post
+from posts.models import Post, Comment
 
 
 class TestCase(APITestCase):
@@ -144,3 +144,83 @@ class TestCase(APITestCase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_read_all_comments(self):
+        self.post = Post.objects.create(title='Title of post one', body='Body of the post', user=self.user)
+
+        self.comment1 = Comment.objects.create(text='Text of comment one.', post=self.post, user=self.user)
+        self.comment2 = Comment.objects.create(text='Text of comment two.', post=self.post, user=self.user)
+        self.comment3 = Comment.objects.create(text='Text of comment three.', post=self.post, user=self.user)
+
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.get(reverse('comments'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        for i in range(3):
+            self.assertIn(response.data[i]['id'], [self.comment1.id, self.comment2.id, self.comment3.id])
+            self.assertEqual(response.data[i]['post']['id'], self.post.id)
+            self.assertEqual(response.data[i]['post']['title'], self.post.title)
+            self.assertEqual(response.data[i]['user']['id'], self.user.id)
+            self.assertEqual(response.data[i]['user']['username'], self.user.username)
+
+    def test_read_comment_detail(self):
+        self.post = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.comment = Comment.objects.create(text='Text of comment one.', post=self.post, user=self.user)
+
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.get(reverse('comment_by_id', kwargs={'id': self.comment.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data['id'], self.comment.id)
+        self.assertEqual(response.data['post']['id'], self.post.id)
+        self.assertEqual(response.data['post']['title'], self.post.title)
+        self.assertEqual(response.data['text'], self.comment.text)
+        self.assertEqual(response.data['user']['id'], self.user.id)
+        self.assertEqual(response.data['user']['username'], self.user.username)
+
+    def test_read_comment_detail_wrong_id(self):
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.get(reverse('comment_by_id', kwargs={'id': 999}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_read_comment_detail_negative_id(self):
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        response = self.client.get(reverse('comment_by_id', kwargs={'id': -1}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_comment_creation(self):
+        self.post = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        sample_data = {
+            "text": "Sample Text",
+            "post": self.post.id
+        }
+        response = self.client.post(reverse('comments'), sample_data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['id'], Comment.objects.last().id)
+        self.assertEqual(response.data['text'], sample_data['text'])
+        self.assertEqual(response.data['post'], sample_data['post'])
+        self.assertEqual(response.data['user']['id'], self.user.id)
+        self.assertEqual(response.data['user']['username'], self.user.username)
+
+    def test_comment_creation_post_does_not_exist(self):
+        self.post = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        sample_data = {
+            "text": "Sample Text",
+            "post": 999
+        }
+        response = self.client.post(reverse('comments'), sample_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'], 'Failed to create object!')
+
+    def test_comment_creation_post_negative_id(self):
+        self.post = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        sample_data = {
+            "text": "Sample Text",
+            "post": -1
+        }
+        response = self.client.post(reverse('comments'), sample_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'], 'Failed to create object!')
