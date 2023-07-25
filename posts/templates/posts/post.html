@@ -47,16 +47,21 @@
                             <span class="ml-2">{{ comment.user }}</span>
                         </div>
                     </div>
-                    <div class="bg-base-200 p-2 rounded-md">
+                    <div id="txt{{ comment.id }}" class="bg-base-200 p-2 rounded-md">
                         <p>
                             {{ comment.text }}
                         </p>
                     </div>
-                    <div class="bg-base-200 p-2 border-primary border-t-2">
-                        {% if comment.date_created != comment.date_updated %}
-                            <small><i>Updated at</i></small>
+                    <div class="bg-base-200 p-2 border-primary border-t-2 flex justify-between">
+                        <div>
+                            {% if comment.date_created != comment.date_updated %}
+                                <small><i>Updated at</i></small>
+                            {% endif %}
+                            <span>{{ comment.date_updated }}</span>
+                        </div>
+                        {% if comment.user == user %}
+                            <a id="btn{{ comment.id }}" href="#" class="bg-primary p-1 rounded-lg font-bold hover:bg-emerald-800 update-button">Edit</a>
                         {% endif %}
-                        <span>{{ comment.date_updated }}</span>
                     </div>
                 </div>
             {% endfor %}
@@ -66,8 +71,9 @@
                         {% csrf_token %}
                         <table class="mx-auto text-center w-1/2 max-lg:w-full">
                             <tr>
-                                <td><textarea name="text" class="textarea input-bordered w-full mb-4 text-base" rows="5"
-                                              placeholder="Type your comment here"></textarea></td>
+                                <td>
+                                    <textarea name="text" class="textarea input-bordered w-full mb-4 text-base" rows="5" placeholder="Type your comment here"></textarea>
+                                </td>
                             </tr>
                             <tr>
                                 <td>

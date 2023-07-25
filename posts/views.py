@@ -243,7 +243,7 @@ def profile_view(request):
     context = {
         'api_key': request.session.get('token', ''),
         'user': request.user,
-        'posts': Post.objects.filter(user=request.user),
+        'posts': Post.objects.filter(user=request.user).order_by('-date_updated'),
     }
     return render(request, 'posts/profile.html', context=context)
 
@@ -395,7 +395,7 @@ def login_user(request):
         context = {
             'api_key': request.session.get('token', ''),
             'user': user,
-            'posts': Post.objects.filter(user=request.user),
+            'posts': Post.objects.filter(user=request.user).order_by('-date_updated'),
         }
         return render(request, 'posts/profile.html', context)
     else:
@@ -450,3 +450,19 @@ def password_reset(request):
             'error': 'Failed to change password! Current password is incorrect.'
         }
         return render(request, 'posts/profile.html', context)
+
+
+def update_comment(request, id):
+    post_id = request.POST.get('post_id', '')
+    comment = Comment.objects.get(pk=id)
+    text = request.POST.get('comment', comment.text)
+    comment.text = text
+    comment.save()
+
+    context = {
+        'post': Post.objects.get(id=post_id),
+        'id': post_id,
+        'comments': Comment.objects.select_related('post', 'user').filter(post=post_id)
+    }
+
+    return render(request, 'posts/post.html', context)

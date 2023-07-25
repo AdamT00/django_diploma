@@ -21,6 +21,7 @@ urlpatterns = [
     path('logout/', post_views.logout_view, name='logout-user'),
     path('password-reset/', post_views.password_reset, name='password-reset'),
     path('create-comment/', post_views.create_comment, name='create-comment'),
+    path('update-comment/<int:id>/', post_views.update_comment, name='update-comment'),
 
     path('accounts/', include("django.contrib.auth.urls")),
     path('accounts/login/', auth_views.LoginView.as_view),
