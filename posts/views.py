@@ -6,10 +6,9 @@ from rest_framework import authentication
 from rest_framework import status, serializers
 from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.response import Response
-from rest_framework.reverse import reverse
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -452,6 +451,7 @@ def password_reset(request):
         return render(request, 'posts/profile.html', context)
 
 
+@csrf_exempt
 def update_comment(request, id):
     post_id = request.POST.get('post_id', '')
     comment = Comment.objects.get(pk=id)

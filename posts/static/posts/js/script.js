@@ -18,7 +18,6 @@ for (let i = 0; i < editBtn.length; i++) {
                 let post_id = window.location.pathname.split('/')[2];
                 txt.innerHTML = `
                 <form method="post" action="/update-comment/`+ id +`/">
-                    <input type="hidden" name="csrfmiddlewaretoken" value="rletg97zTcL15bq1T266sm6SQj95OaSRsTkHz2QPtR48xgHwTLVWH30GxE6XHLmf">
                     <input type="hidden" name="post_id" value="`+ post_id +`">
                     <textarea class="textarea input-bordered w-full text-base" name="comment" rows="5">` + json.text + `</textarea>
                     <input type="submit" class="btn bg-primary w-full hover:bg-emerald-800" value="Save">
