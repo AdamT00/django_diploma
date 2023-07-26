@@ -312,6 +312,32 @@ def create_post(request):
     return render(request, 'posts/posts_list.html', context)
 
 
+@csrf_exempt
+@login_required
+def update_post(request, id):
+    post = Post.objects.get(pk=id)
+
+    if post.user == request.user:
+        text = request.POST.get('body', post.body)
+        post.body = text
+        post.save()
+
+        context = {
+            'post': post,
+            'id': id,
+            'comments': Comment.objects.select_related('post', 'user').filter(post=id)
+        }
+        return render(request, 'posts/post.html', context)
+    else:
+        context = {
+            'post': post,
+            'id': id,
+            'comments': Comment.objects.select_related('post', 'user').filter(post=id),
+            'error': 'Failed to edit post.'
+        }
+        return render(request, 'posts/post.html', context)
+
+
 def create_comment(request):
     text = request.POST.get('text', '')
     post_id = request.POST.get('id', ''),

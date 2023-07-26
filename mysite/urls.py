@@ -14,6 +14,7 @@ urlpatterns = [
     path('posts/', post_views.posts_view),
     path('blog-post/<int:id>/', post_views.post_view, name='blog-post'),
     path('create-post/', post_views.create_post, name='create-post'),
+    path('update-post/<int:id>/', post_views.update_post, name='update-post'),
     path('profile/', post_views.profile_view, name='profile'),
     path('login-register/', post_views.login_register_view, name='login-register'),
     path('create-user/', post_views.create_user, name='register-user'),

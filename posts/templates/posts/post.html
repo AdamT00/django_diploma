@@ -36,7 +36,9 @@
             <span class="text-sm">Last updated at <b>{{ post.date_updated }}</b></span>
         </div>
         <hr class="border-primary mt-4 mb-4">
-        <p>{{ post.body }}</p>
+        <div id="post{{ post.id }}">
+            <p>{{ post.body }}</p>
+        </div>
 
         <div class="mt-16">
             {% for comment in comments %}
