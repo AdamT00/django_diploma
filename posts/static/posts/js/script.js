@@ -1,4 +1,4 @@
-editBtn = document.querySelectorAll('.update-button');
+editBtn = document.querySelectorAll('.update-comment-button');
 
 for (let i = 0; i < editBtn.length; i++) {
     editBtn[i].addEventListener('click', function (e) {
@@ -11,7 +11,8 @@ for (let i = 0; i < editBtn.length; i++) {
         fetch(url + id, {
             headers: {
                 'Authorization': 'Token ' + token,
-            }
+            },
+            credentials: 'same-origin'
         })
             .then((response) => response.json())
             .then((json) => {

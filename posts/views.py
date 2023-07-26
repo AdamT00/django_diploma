@@ -452,17 +452,30 @@ def password_reset(request):
 
 
 @csrf_exempt
+@login_required
 def update_comment(request, id):
     post_id = request.POST.get('post_id', '')
+    post = Post.objects.get(pk=post_id)
     comment = Comment.objects.get(pk=id)
-    text = request.POST.get('comment', comment.text)
-    comment.text = text
-    comment.save()
 
-    context = {
-        'post': Post.objects.get(id=post_id),
-        'id': post_id,
-        'comments': Comment.objects.select_related('post', 'user').filter(post=post_id)
-    }
+    if comment.user == request.user and comment.post.id == post.id:
+        text = request.POST.get('comment', comment.text)
+        comment.text = text
+        comment.save()
 
-    return render(request, 'posts/post.html', context)
+        context = {
+            'post': post,
+            'id': post_id,
+            'comments': Comment.objects.select_related('post', 'user').filter(post=post_id)
+        }
+
+        return render(request, 'posts/post.html', context)
+    else:
+        context = {
+            'post': post,
+            'id': post_id,
+            'comments': Comment.objects.select_related('post', 'user').filter(post=post_id),
+            'error': 'Failed to edit comment.'
+        }
+
+        return render(request, 'posts/post.html', context)

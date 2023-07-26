@@ -23,7 +23,13 @@
         </div>
     {% endif %}
     <div class="w-2/3 mx-auto max-lg:w-full">
-        <h1 class="text-3xl">{{ post.title }}</h1>
+        <div class="flex justify-between flex-nowrap items-center">
+            <h1 class="text-3xl inline-block">{{ post.title }}</h1>
+            {% if post.user == user %}
+                <a id="edit-post-{{ post.id }}" href="#"
+                   class="bg-primary p-1 rounded-lg font-bold hover:bg-emerald-800 update-post-button">Edit Post</a>
+            {% endif %}
+        </div>
         <div class="flex flex-wrap justify-between">
             <span class="text-sm">Post created at <b>{{ post.date_created }}</b></span>
             <span class="text-sm">Created by <b>{{ post.user }}</b></span>
@@ -60,7 +66,8 @@
                             <span>{{ comment.date_updated }}</span>
                         </div>
                         {% if comment.user == user %}
-                            <a id="btn{{ comment.id }}" href="#" class="bg-primary p-1 rounded-lg font-bold hover:bg-emerald-800 update-button">Edit</a>
+                            <a id="btn{{ comment.id }}" href="#"
+                               class="bg-primary p-1 rounded-lg font-bold hover:bg-emerald-800 update-comment-button">Edit</a>
                         {% endif %}
                     </div>
                 </div>
@@ -72,7 +79,8 @@
                         <table class="mx-auto text-center w-1/2 max-lg:w-full">
                             <tr>
                                 <td>
-                                    <textarea name="text" class="textarea input-bordered w-full mb-4 text-base" rows="5" placeholder="Type your comment here"></textarea>
+                                    <textarea name="text" class="textarea input-bordered w-full mb-4 text-base" rows="5"
+                                              placeholder="Type your comment here"></textarea>
                                 </td>
                             </tr>
                             <tr>
