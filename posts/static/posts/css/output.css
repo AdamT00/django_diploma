@@ -2009,12 +2009,28 @@ html {
   justify-content: space-between;
 }
 
+.overflow-auto {
+  overflow: auto;
+}
+
 .overflow-hidden {
   overflow: hidden;
 }
 
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+.overflow-ellipsis {
+  text-overflow: ellipsis;
+}
+
 .text-ellipsis {
   text-overflow: ellipsis;
+}
+
+.break-words {
+  overflow-wrap: break-word;
 }
 
 .rounded-lg {

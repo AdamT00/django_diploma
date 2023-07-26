@@ -279,6 +279,7 @@ def post_view(request, id):
     return render(request, 'posts/post.html', context=context)
 
 
+@login_required
 def create_post(request):
     title = request.POST.get('title', '')
     body = request.POST.get('body', '')
@@ -338,6 +339,7 @@ def update_post(request, id):
         return render(request, 'posts/post.html', context)
 
 
+@login_required
 def create_comment(request):
     text = request.POST.get('text', '')
     post_id = request.POST.get('id', ''),
