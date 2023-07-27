@@ -317,9 +317,9 @@ def create_post(request):
 @login_required
 def update_post(request, id):
     post = Post.objects.get(pk=id)
+    text = request.POST.get('body', post.body)
 
-    if post.user == request.user:
-        text = request.POST.get('body', post.body)
+    if post.user == request.user and text is not None:
         post.body = text
         post.save()
 

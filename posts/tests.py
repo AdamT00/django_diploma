@@ -16,7 +16,9 @@ class TestCase(APITestCase):
                                              is_staff=1,
                                              is_active=1,
                                              password='password')
+        self.user2 = User.objects.create_user(username='test_user2', email='testUser2@example.com', password='password')
         Token.objects.create(user=self.user)
+        Token.objects.create(user=self.user2)
         super(TestCase, self).setUp()
 
     def test_read_all_posts(self):
@@ -225,4 +227,65 @@ class TestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['message'], 'Failed to create object!')
 
-# todo test comment update
+    def test_comment_update(self):
+        self.post = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.comment = Comment.objects.create(text='Original text of the comment', post=self.post, user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        sample_data = {'text': 'Sample text'}
+        response = self.client.put(
+            reverse('comment_by_id', kwargs={'id': self.comment.id}),
+            data=sample_data,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['id'], self.comment.id)
+        self.assertEqual(response.data['text'], sample_data['text'])
+
+    def test_comment_update_empty_text(self):
+        self.post = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.comment = Comment.objects.create(text='Original text of the comment', post=self.post, user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        sample_data = {'text': ''}
+        response = self.client.put(
+            reverse('comment_by_id', kwargs={'id': self.comment.id}),
+            data=sample_data,
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_comment_update_id_doesnt_exist(self):
+        self.post = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.comment = Comment.objects.create(text='Original text of the comment', post=self.post, user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        sample_data = {'text': 'Sample text'}
+        response = self.client.put(
+            reverse('comment_by_id', kwargs={'id': 9999}),
+            data=sample_data,
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['detail'], 'Not found.')
+
+    def test_comment_update_wrong_user(self):
+        self.post = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.comment = Comment.objects.create(text='Original text of the comment', post=self.post, user=self.user2)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        sample_data = {'text': 'Sample text'}
+        response = self.client.put(
+            reverse('comment_by_id', kwargs={'id': self.comment.id}),
+            data=sample_data,
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'], 'Failed to update object!')
+
+    def test_comment_update_negative_id(self):
+        self.post = Post.objects.create(title='Title of the post', body='Body of the post', user=self.user)
+        self.comment = Comment.objects.create(text='Original text of the comment', post=self.post, user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='token ' + self.user.auth_token.key)
+        sample_data = {'text': 'Sample text'}
+        response = self.client.put(
+            reverse('comment_by_id', kwargs={'id': -1}),
+            data=sample_data,
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['detail'], 'Not found.')
