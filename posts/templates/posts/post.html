@@ -3,31 +3,32 @@
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
+<div class="p-4">
     {% if message %}
-        <div class="alert alert-success mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-                 viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <span>{{ message }}</span>
-        </div>
+    <div class="alert alert-success mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+             viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>{{ message }}</span>
+    </div>
     {% elif error %}
-        <div class="alert alert-error mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-                 viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <span>{{ error }}</span>
-        </div>
+    <div class="alert alert-error mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+             viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>{{ error }}</span>
+    </div>
     {% endif %}
     <div class="w-2/3 mx-auto max-lg:w-full">
         <div class="flex justify-between flex-nowrap items-center">
             <h1 class="text-3xl inline-block">{{ post.title }}</h1>
             {% if post.user == user %}
-                <a id="edit-post-{{ post.id }}" href="#"
-                   class="bg-primary p-1 rounded-lg font-bold hover:bg-emerald-800 update-post-button">Edit Post</a>
+            <a id="edit-post-{{ post.id }}" href="#"
+               class="bg-primary p-1 rounded-lg font-bold hover:bg-emerald-800 update-post-button">Edit Post</a>
             {% endif %}
         </div>
         <div class="flex flex-wrap justify-between">
@@ -42,59 +43,60 @@
 
         <div class="mt-16">
             {% for comment in comments %}
-                <div id="comment{{ forloop.counter }}"
-                     class="w-1/2 m-4 mx-auto border-2 border-primary rounded-md max-lg:w-full">
-                    <div class="flex justify-between p-2 bg-primary">
-                        <a href="{% url 'blog-post' post.id %}#comment{{ forloop.counter }}">#{{ forloop.counter }}</a>
-                        <div class="flex items-center">
-                            {% if comment.user == post.user %}
-                                <h3 class="text-lg">
-                                    <span class="badge badge-md">CREATOR</span>
-                                </h3>
-                            {% endif %}
-                            <span class="ml-2">{{ comment.user }}</span>
-                        </div>
-                    </div>
-                    <div id="txt{{ comment.id }}" class="bg-base-200 p-2 rounded-md">
-                        <p>
-                            {{ comment.text }}
-                        </p>
-                    </div>
-                    <div class="bg-base-200 p-2 border-primary border-t-2 flex justify-between">
-                        <div>
-                            {% if comment.date_created != comment.date_updated %}
-                                <small><i>Updated at</i></small>
-                            {% endif %}
-                            <span>{{ comment.date_updated }}</span>
-                        </div>
-                        {% if comment.user == user %}
-                            <a id="btn{{ comment.id }}" href="#"
-                               class="bg-primary p-1 rounded-lg font-bold hover:bg-emerald-800 update-comment-button">Edit</a>
+            <div id="comment{{ forloop.counter }}"
+                 class="w-1/2 m-4 mx-auto border-2 border-primary rounded-md max-lg:w-full">
+                <div class="flex justify-between p-2 bg-primary">
+                    <a href="{% url 'blog-post' post.id %}#comment{{ forloop.counter }}">#{{ forloop.counter }}</a>
+                    <div class="flex items-center">
+                        {% if comment.user == post.user %}
+                        <h3 class="text-lg">
+                            <span class="badge badge-md">CREATOR</span>
+                        </h3>
                         {% endif %}
+                        <span class="ml-2">{{ comment.user }}</span>
                     </div>
                 </div>
+                <div id="txt{{ comment.id }}" class="bg-base-200 p-2 rounded-md">
+                    <p>
+                        {{ comment.text }}
+                    </p>
+                </div>
+                <div class="bg-base-200 p-2 border-primary border-t-2 flex justify-between">
+                    <div>
+                        {% if comment.date_created != comment.date_updated %}
+                        <small><i>Updated at</i></small>
+                        {% endif %}
+                        <span>{{ comment.date_updated }}</span>
+                    </div>
+                    {% if comment.user == user %}
+                    <a id="btn{{ comment.id }}" href="#"
+                       class="bg-primary p-1 rounded-lg font-bold hover:bg-emerald-800 update-comment-button">Edit</a>
+                    {% endif %}
+                </div>
+            </div>
             {% endfor %}
             {% if user.is_authenticated %}
-                <div>
-                    <form action="{% url 'create-comment' %}" method="post">
-                        {% csrf_token %}
-                        <table class="mx-auto text-center w-1/2 max-lg:w-full">
-                            <tr>
-                                <td>
+            <div>
+                <form action="{% url 'create-comment' %}" method="post">
+                    {% csrf_token %}
+                    <table class="mx-auto text-center w-1/2 max-lg:w-full">
+                        <tr>
+                            <td>
                                     <textarea name="text" class="textarea input-bordered w-full mb-4 text-base" rows="5"
                                               placeholder="Type your comment here"></textarea>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <input type="hidden" name="id" value="{{ id }}">
-                                    <input type="submit" value="Comment" class="btn w-full">
-                                </td>
-                            </tr>
-                        </table>
-                    </form>
-                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="hidden" name="id" value="{{ id }}">
+                                <input type="submit" value="Comment" class="btn w-full">
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
             {% endif %}
         </div>
     </div>
+</div>
 {% endblock %}

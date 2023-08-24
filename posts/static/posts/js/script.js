@@ -1,3 +1,6 @@
+AOS.init({
+    once: true,
+});
 const editCommentBtn = document.querySelectorAll('.update-comment-button');
 const editPostBtn = document.querySelector('.update-post-button');
 const url = 'http://127.0.0.1:8000/';

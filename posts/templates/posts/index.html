@@ -8,6 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Adam's Blog | {% block title %}Welcome To My Blog{% endblock %}</title>
     <link rel="stylesheet" href="{% static "posts/css/output.css" %}">
+    <link rel="stylesheet" href="{% static "posts/libs/aos/aos.css" %}">
 </head>
 <body>
 <div class="navbar bg-base-200">
@@ -58,7 +59,7 @@
     </div>
 </div>
 
-<div id="main-content" class="p-4">
+<div id="main-content">
     {% block content %}
 
     {% endblock %}
@@ -68,6 +69,7 @@
         <p>Copyright © {% now "Y" %} - All right reserved by Adam Tolcser</p>
     </div>
 </footer>
+<script src="{% static 'posts/libs/aos/aos.js' %}"></script>
 <script src="{% static 'posts/js/script.js' %}"></script>
 </body>
 </html>

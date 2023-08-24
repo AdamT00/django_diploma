@@ -216,7 +216,7 @@ class CommentById(ListAPIView):
 
 
 def home_view(request):
-    all_posts = Post.objects.all().order_by('-date_updated')[:5]
+    all_posts = Post.objects.all().order_by('-date_updated')[:4]
     context = {
         'posts': all_posts,
         'user': request.user if request.user.is_authenticated else None,
